@@ -61,17 +61,13 @@ class ViewController: UIViewController {
         ])
     }
 
-    var timer: Timer?
-    var timer1: Timer?
-    var timer2: Timer?
-    private func showPartners() {
-        startAnother()
-    }
+    var typingTimer: Timer?
+    var deleteTimer: Timer?
 
     lazy var totalCount = partners.count
     var position = 0
 
-    private func startAnother() {
+    private func showPartners() {
          label.text = ""
         if position == totalCount { position = 0 }
         let text = partners[position]
@@ -82,10 +78,13 @@ class ViewController: UIViewController {
     private func startTyping(text: String) {
         let charactersCount = text.count
          var position = 0
-        timer1 = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) { [weak self] _ in
+        typingTimer = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) { [weak self] _ in
             if position == (charactersCount) {
-                self?.timer1?.invalidate()
-                self?.deleteTyping(text)
+                self?.typingTimer?.invalidate()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    self?.deleteTyping(text)
+                }
+
                 return
 
             }
@@ -98,11 +97,11 @@ class ViewController: UIViewController {
     private func deleteTyping(_ text: String) {
         let charactersCount = text.count
          var position = charactersCount - 1
-        timer2 = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
+        deleteTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
             if position == -1 {
-                self?.timer2?.invalidate()
+                self?.deleteTimer?.invalidate()
 
-                self?.startAnother()
+                self?.showPartners()
                 return
 
             }
